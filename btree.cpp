@@ -1,52 +1,85 @@
-#include <iostream>
-#include <map>
-#include "BTreeNode.h"  // Include the header file
+#include "BTree.h"
+#include <algorithm>
 
-/*
-class btree {
-public:
-    std::map<std::string, std::string> storage;
+BTreeNode::BTreeNode(int minDegree, bool leaf) : minDegree(minDegree), leaf(leaf) {}
 
-    void insert(std::string key, std::string value) {
-        storage[key] = value;
+void BTreeNode::traverse() {
+    for (int i = 0; i < keys.size(); i++) {
+        if (!leaf)
+            children[i]->traverse();
+        std::cout << keys[i] << " ";
     }
+    if (!leaf)
+        children[keys.size()]->traverse();
+}
 
-    std::string query(std::string key) {
-        return storage.count(key) ? storage[key] : "Not Found";
-    }
-};
-*/
-class btree {
-    private:
-        BTreeNode* root;
-    
-        BTreeNode* search(BTreeNode* node, std::string key) {
-            int i = 0;
-            while (i < node->keys.size() && key > node->keys[i])
+BTreeNode* BTreeNode::search(std::string key) {
+    int i = 0;
+    while (i < keys.size() && key > keys[i])
+        i++;
+    if (i < keys.size() && keys[i] == key)
+        return this;
+    if (leaf)
+        return nullptr;
+    return children[i]->search(key);
+}
+
+void BTreeNode::insertNonFull(std::string key) {
+    int i = keys.size() - 1;
+    if (leaf) {
+        keys.push_back("");
+        while (i >= 0 && keys[i] > key) {
+            keys[i + 1] = keys[i];
+            i--;
+        }
+        keys[i + 1] = key;
+    } else {
+        while (i >= 0 && keys[i] > key)
+            i--;
+        if (children[i + 1]->keys.size() == 2 * minDegree - 1) {
+            splitChild(i + 1, children[i + 1]);
+            if (keys[i + 1] < key)
                 i++;
-            if (i < node->keys.size() && node->keys[i] == key)
-                return node;
-            if (node->leaf)
-                return nullptr;
-            return search(node->children[i], key);
         }
-    
-    public:
-        btree() { root = new BTreeNode(true); }
-    
-        bool search(std::string key) {
-            return search(root, key) != nullptr;
-        }
-    
-        void insert(std::string key) {
-            root->keys.push_back(key);  // Simple insertion (Extend for full B-Tree insert logic)
-            std::sort(root->keys.begin(), root->keys.end());  // Keep sorted for binary search
-        }
-    };
-    
-int main() {
-    btree db;
-    db.insert("transistor M1", "width=1.2u length=0.18u");
-    std::cout << "Query: " << db.query("transistor M1") << std::endl;
-    return 0;
+        children[i + 1]->insertNonFull(key);
+    }
+}
+
+void BTreeNode::splitChild(int i, BTreeNode* y) {
+    BTreeNode* z = new BTreeNode(y->minDegree, y->leaf);
+    for (int j = 0; j < minDegree - 1; j++)
+        z->keys.push_back(y->keys[j + minDegree]);
+    if (!y->leaf) {
+        for (int j = 0; j < minDegree; j++)
+            z->children.push_back(y->children[j + minDegree]);
+    }
+    y->keys.resize(minDegree - 1);
+    children.insert(children.begin() + i + 1, z);
+    keys.insert(keys.begin() + i, y->keys[minDegree - 1]);
+}
+
+BTree::BTree(int minDegree) : minDegree(minDegree) {
+    root = new BTreeNode(minDegree, true);
+}
+
+void BTree::insert(std::string key) {
+    if (root->keys.size() == 2 * minDegree - 1) {
+        BTreeNode* s = new BTreeNode(minDegree, false);
+        s->children.push_back(root);
+        s->splitChild(0, root);
+        int i = (s->keys[0] < key) ? 1 : 0;
+        s->children[i]->insertNonFull(key);
+        root = s;
+    } else {
+        root->insertNonFull(key);
+    }
+}
+
+void BTree::traverse() {
+    if (root)
+        root->traverse();
+}
+
+BTreeNode* BTree::search(std::string key) {
+    return root ? root->search(key) : nullptr;
 }
