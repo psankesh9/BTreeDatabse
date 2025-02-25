@@ -1,21 +1,19 @@
-B-Tree Persistent Storage & Multithreading Project
+# B-Tree Persistent Storage & Multithreading Project
 
-Overview
+## Overview
 
-This project implements a B-Tree data structure with persistent storage using memory-mapped files (mmap) and multi-threaded queries for concurrency. The system efficiently organizes, stores, and retrieves data while demonstrating key database principles.
+This project implements a **B-Tree** data structure with **persistent storage** using memory-mapped files (`mmap`) and **multi-threaded queries** for concurrency. The system efficiently organizes, stores, and retrieves data while demonstrating key database principles.
 
-Features
+## Features
 
-B-Tree Implementation: Supports efficient insertions, searches, and in-order traversal.
+- **B-Tree Implementation**: Supports efficient insertions, searches, and in-order traversal.
+- **Persistent Storage**: Uses memory-mapped files (`mmap`) to store key-value data.
+- **Multithreading**: Uses `std::mutex` to safely query the B-Tree concurrently.
+- **Efficient Search & Storage**: Designed for database-like performance with O(log n) search complexity.
 
-Persistent Storage: Uses memory-mapped files (mmap) to store key-value data.
+## Project Structure
 
-Multithreading: Uses std::mutex to safely query the B-Tree concurrently.
-
-Efficient Search & Storage: Designed for database-like performance with O(log n) search complexity.
-
-Project Structure
-
+```
 BTree_Project/
 │── BTree.h                 # B-Tree class definition
 │── BTree.cpp               # B-Tree implementation
@@ -25,125 +23,110 @@ BTree_Project/
 │── mmap.cpp                # Simple memory-mapped file example
 │── PersistentStorage.cpp   # Persistent storage class implementation
 │── MultiThreadedQueries.cpp # Demonstrates multi-threaded queries
+```
 
-File Descriptions
+## File Descriptions
 
-1. B-Tree Implementation
+### B-Tree Implementation
 
-BTree.h & BTree.cpp
+#### `BTree.h` & `BTree.cpp`
+Defines and implements the **B-Tree**, including methods for insertion, searching, splitting nodes, and traversal.
 
-Defines and implements the B-Tree, including methods for insertion, searching, splitting nodes, and traversal.
+- `insert(std::string key)`: Inserts a key into the B-Tree.
+- `search(std::string key)`: Searches for a key in the tree.
+- `traverse()`: Performs an in-order traversal.
+- `splitChild()`: Splits full nodes to maintain balance.
 
-insert(std::string key): Inserts a key into the B-Tree.
+#### `BTreeNode.h` & `BTreeNode.cpp`
+Defines the **B-Tree Node**, which stores keys and pointers to child nodes.
 
-search(std::string key): Searches for a key in the tree.
+- Each node can hold multiple keys (defined by `minDegree`).
+- Nodes are split when they become full (to maintain balance).
 
-traverse(): Performs an in-order traversal.
+### Example Usage
 
-splitChild(): Splits full nodes to maintain balance.
+#### `main.cpp`
+Demonstrates how to use the **B-Tree**:
 
-BTreeNode.h & BTreeNode.cpp
+1. Creates a B-Tree.
+2. Inserts keys (`transistor M1`, `resistor R1`, etc.).
+3. Performs an in-order traversal.
+4. Searches for a specific key.
 
-Defines the B-Tree Node, which stores keys and pointers to child nodes.
+### Persistent Storage
 
-Each node can hold multiple keys (defined by minDegree).
+#### `PersistentStorage.cpp`
+Implements a persistent storage system using **memory-mapped files** (`mmap`).
 
-Nodes are split when they become full (to maintain balance).
+- `store(std::string key, std::string value)`: Saves key-value pairs persistently.
+- `load()`: Loads and prints stored data from the memory-mapped file.
 
-2. Example Usage
+#### `mmap.cpp`
+A simple example demonstrating the basics of **memory-mapped file storage**. It:
 
-main.cpp
+1. Opens a file (`ic_data.bin`).
+2. Maps it into memory.
+3. Stores data (`transistor M1 width=1.2u length=0.18u`).
+4. Reads back and prints the data.
 
-Demonstrates how to use the B-Tree:
+### Multithreading & Concurrency
 
-Creates a B-Tree.
+#### `MultiThreadedQueries.cpp`
+Demonstrates querying the **B-Tree** in a multi-threaded environment.
 
-Inserts keys (transistor M1, resistor R1, etc.).
+- Uses `std::mutex` to prevent race conditions.
+- Launches multiple threads that search the tree concurrently.
 
-Performs an in-order traversal.
+## Installation & Usage
 
-Searches for a specific key.
+### Prerequisites
 
-3. Persistent Storage
+- **C++ Compiler** (`g++` or `clang++`)
+- **Linux/macOS** (for `mmap` support)
 
-PersistentStorage.cpp
-
-Implements a persistent storage system using memory-mapped files (mmap).
-
-store(std::string key, std::string value): Saves key-value pairs persistently.
-
-load(): Loads and prints stored data from the memory-mapped file.
-
-mmap.cpp
-
-A simple example demonstrating the basics of memory-mapped file storage. It:
-
-Opens a file (ic_data.bin).
-
-Maps it into memory.
-
-Stores data (transistor M1 width=1.2u length=0.18u).
-
-Reads back and prints the data.
-
-4. Multithreading & Concurrency
-
-MultiThreadedQueries.cpp
-
-Demonstrates querying the B-Tree in a multi-threaded environment.
-
-Uses std::mutex to prevent race conditions.
-
-Launches multiple threads that search the tree concurrently.
-
-Installation & Usage
-
-Prerequisites
-
-C++ Compiler (g++ or clang++)
-
-Linux/macOS (for mmap support)
-
-Compilation
+### Compilation
 
 To compile all files:
+```bash
+g++ -std=c++11 -o btree_main main.cpp BTree.cpp BTreeNode.cpp
+```
 
- g++ -std=c++11 -o btree_main main.cpp BTree.cpp BTreeNode.cpp
+To compile the **persistent storage** demo:
+```bash
+g++ -std=c++11 -o persistent_storage PersistentStorage.cpp
+```
 
-To compile the persistent storage demo:
+To compile the **multi-threaded queries** demo:
+```bash
+g++ -std=c++11 -pthread -o multithread MultiThreadedQueries.cpp BTree.cpp BTreeNode.cpp
+```
 
- g++ -std=c++11 -o persistent_storage PersistentStorage.cpp
+### Running the Program
 
-To compile the multi-threaded queries demo:
+#### Run the **B-Tree Example**:
+```bash
+./btree_main
+```
 
- g++ -std=c++11 -pthread -o multithread MultiThreadedQueries.cpp BTree.cpp BTreeNode.cpp
+#### Run the **Persistent Storage Demo**:
+```bash
+./persistent_storage
+```
 
-Running the Program
+#### Run the **Multithreaded Queries**:
+```bash
+./multithread
+```
 
-Run the B-Tree Example:
+## Future Enhancements
 
- ./btree_main
+- **Implement deletion**: The header has a `remove()` method, but it's not implemented.
+- **Integrate Persistence with B-Tree**: Store B-Tree nodes in memory-mapped storage.
+- **More Efficient Concurrency**: Implement finer-grained locking mechanisms.
 
-Run the Persistent Storage Demo:
+## Author & Acknowledgments
 
- ./persistent_storage
+- **Author**: [Your Name]
+- **Inspired by**: Database indexing techniques & system-level storage management.
 
-Run the Multithreaded Queries:
-
- ./multithread
-
-Future Enhancements
-
-Implement deletion: The header has a remove() method, but it's not implemented.
-
-Integrate Persistence with B-Tree: Store B-Tree nodes in memory-mapped storage.
-
-More Efficient Concurrency: Implement finer-grained locking mechanisms.
-
-Author & Acknowledgments
-
-Author: [Your Name]
-
-Inspired by: Database indexing techniques & system-level storage management.
-
-This project demonstrates fundamental concepts in data structures, memory management, and concurrency—key topics in modern database and storage systems.
+This project demonstrates fundamental concepts in **data structures, memory management, and concurrency**—key topics in modern database and storage systems.
