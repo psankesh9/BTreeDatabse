@@ -126,7 +126,7 @@ g++ -std=c++11 -pthread -o multithread MultiThreadedQueries.cpp BTree.cpp BTreeN
 
 ## Author & Acknowledgments
 
-- **Author**: [Your Name]
+- **Author**: Pratheek Sankeshi
 - **Inspired by**: Database indexing techniques & system-level storage management.
 
 This project demonstrates fundamental concepts in **data structures, memory management, and concurrency**—key topics in modern database and storage systems.
